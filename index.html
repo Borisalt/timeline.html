@@ -117,12 +117,17 @@ function dim(y,m){return new Date(y,m+1,0).getDate();}
 function fmtD(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function dow(y,m,d){return new Date(y,m,d).getDay();}
 
+const MONTH_COLS=31;
+
 function getAllDays(){
   const days=[];
   for(let i=0;i<VM;i++){
     const m=new Date(viewStart);m.setMonth(m.getMonth()+i);
     const y=m.getFullYear(),mo=m.getMonth(),cnt=dim(y,mo);
-    for(let d=1;d<=cnt;d++) days.push({year:y,month:mo,day:d,dow:dow(y,mo,d),first:d===1});
+    for(let d=1;d<=MONTH_COLS;d++){
+      if(d<=cnt) days.push({year:y,month:mo,day:d,dow:dow(y,mo,d),first:d===1,empty:false});
+      else days.push({year:y,month:mo,day:d,first:false,empty:true,dow:0});
+    }
   }
   return days;
 }
@@ -157,19 +162,20 @@ function render(){
 
   // 헤더
   rh+='<div class="chart-hd"><div class="month-row">';
-  let mi=0;
-  while(mi<days.length){
-    const cm=days[mi].month,cy=days[mi].year;let cnt=0;
-    for(let j=mi;j<days.length&&days[j].month===cm&&days[j].year===cy;j++)cnt++;
-    rh+='<div class="month-span" style="width:'+(cnt*DW)+'px;">'+MN[cm]+' '+cy+'</div>';
-    mi+=cnt;
+  for(let i=0;i<VM;i++){
+    const m=new Date(viewStart);m.setMonth(m.getMonth()+i);
+    rh+='<div class="month-span" style="width:'+(MONTH_COLS*DW)+'px;">'+MN[m.getMonth()]+' '+m.getFullYear()+'</div>';
   }
   rh+='</div><div class="day-row">';
   days.forEach(d=>{
-    const isT=(d.year===today.getFullYear()&&d.month===today.getMonth()&&d.day===today.getDate());
-    rh+='<div class="day-cell'+(d.first?' first':'')+(d.dow===0?' sun':'')+(isT?' today-cell':'')+'">';
-    if(isT)rh+='<div class="today-marker">'+d.day+'</div>';else rh+=d.day;
-    rh+='</div>';
+    if(d.empty){
+      rh+='<div class="day-cell" style="color:transparent;border-left-color:#FAF4F4;"></div>';
+    } else {
+      const isT=(d.year===today.getFullYear()&&d.month===today.getMonth()&&d.day===today.getDate());
+      rh+='<div class="day-cell'+(d.first?' first':'')+(d.dow===0?' sun':'')+(isT?' today-cell':'')+'">';
+      if(isT)rh+='<div class="today-marker">'+d.day+'</div>';else rh+=d.day;
+      rh+='</div>';
+    }
   });
   rh+='</div></div>';
 
