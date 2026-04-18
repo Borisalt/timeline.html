@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timeline</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #fff;
+  overflow-x: auto;
+}
+
+.container { min-width: 700px; }
+
+/* ── 헤더: 월 표시 ── */
+.header {
+  display: flex;
+  border-bottom: 1px solid #F0E0E0;
+}
+.name-col-header {
+  min-width: 160px; max-width: 160px;
+  padding: 10px 14px;
+  font-size: 11px; font-weight: 500;
+  color: #B09090;
+}
+.months-header {
+  flex: 1; display: flex;
+  position: relative;
+}
+.month-block {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  font-size: 11px; font-weight: 500;
+  color: #9E7070;
+  border-left: 1px solid #F5EAEA;
+  position: relative;
+}
+.month-block .days {
+  display: flex; justify-content: space-between;
+  padding: 2px 4px 0;
+  font-size: 9px; font-weight: 300;
+  color: #C8B0B0;
+}
+
+/* ── 오늘 표시 ── */
+.today-line {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 2px;
+  background: #E88E8E;
+  z-index: 10;
+  pointer-events: none;
+}
+.today-dot {
+  position: absolute;
+  top: -3px; left: -4px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #E88E8E;
+}
+
+/* ── 행 ── */
+.row {
+  display: flex;
+  border-bottom: 1px solid #FAF2F2;
+  min-height: 40px;
+  transition: background 0.15s;
+}
+.row:hover { background: rgba(255, 240, 240, 0.3); }
+
+.name-col {
+  min-width: 160px; max-width: 160px;
+  padding: 8px 14px;
+  display: flex; align-items: center; gap: 8px;
+  border-right: 1px solid #F5EAEA;
+}
+.task-icon {
+  width: 8px; height: 8px;
+  border-radius: 50%; flex-shrink: 0;
+}
+.task-name {
+  font-size: 12px; color: #5C3A3A;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.chart-area {
+  flex: 1; position: relative;
+  display: flex;
+}
+.chart-col {
+  flex: 1;
+  border-left: 1px solid #FAF2F2;
+}
+
+/* ── 바 ── */
+.bar-wrap {
+  position: absolute;
+  top: 6px; height: 28px;
+  z-index: 5;
+}
+.bar {
+  height: 100%;
+  border-radius: 6px;
+  display: flex; align-items: center;
+  padding: 0 10px;
+  font-size: 10px; font-weight: 400;
+  white-space: nowrap; overflow: hidden;
+  cursor: default;
+  transition: filter 0.2s;
+}
+.bar:hover { filter: brightness(0.95); }
+
+/* 색상 프리셋 */
+.bar.pink {
+  background: linear-gradient(90deg, #FFDDE4, #FFD0D0);
+  color: #9E5050;
+  border: 1px solid rgba(240, 180, 180, 0.4);
+}
+.bar.peach {
+  background: linear-gradient(90deg, #FFE8CC, #FFDDB8);
+  color: #8E6840;
+  border: 1px solid rgba(240, 200, 160, 0.4);
+}
+.bar.rose {
+  background: linear-gradient(90deg, #FFE0EC, #FFD0E0);
+  color: #9E4870;
+  border: 1px solid rgba(240, 170, 200, 0.4);
+}
+.bar.lavender {
+  background: linear-gradient(90deg, #F0E0FF, #E8D4F8);
+  color: #7850A0;
+  border: 1px solid rgba(200, 170, 240, 0.4);
+}
+.bar.mint {
+  background: linear-gradient(90deg, #D8F5E8, #C8F0DC);
+  color: #408060;
+  border: 1px solid rgba(160, 220, 190, 0.4);
+}
+
+/* 상태 뱃지 */
+.status {
+  font-size: 9px; font-weight: 500;
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-left: 6px;
+  flex-shrink: 0;
+}
+.status.done { background: rgba(100, 180, 130, 0.2); color: #408060; }
+.status.progress { background: rgba(232, 158, 120, 0.2); color: #A06840; }
+.status.todo { background: rgba(180, 160, 200, 0.2); color: #7060A0; }
+</style>
+</head>
+<body>
+<div class="container" id="container"></div>
+
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 여기서 수정하세요
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// 표시할 시작 월 (year, month: 0-11)
+const VIEW_START = new Date(2026, 2, 1);  // 2026년 3월
+const VIEW_MONTHS = 4;                     // 표시할 월 수
+
+// 항목들
+// color: pink, peach, rose, lavender, mint
+// status: done(완료), progress(진행중), todo(예정)
+const tasks = [
+  {
+    name: "스드머 촬드크",
+    color: "pink",
+    start: "2026-03-05",
+    end: "2026-03-20",
+    status: "progress",
+    statusText: "진행중"
+  },
+  {
+    name: "신청_할금금 예약",
+    color: "peach",
+    start: "2026-03-18",
+    end: "2026-04-05",
+    status: "todo",
+    statusText: "진행중"
+  },
+  {
+    name: "컨셉 기획",
+    color: "rose",
+    start: "2026-03-01",
+    end: "2026-03-12",
+    status: "done",
+    statusText: "완료"
+  },
+  {
+    name: "촬영 진행",
+    color: "lavender",
+    start: "2026-04-01",
+    end: "2026-04-20",
+    status: "todo",
+    statusText: "예정"
+  },
+  {
+    name: "보정 및 편집",
+    color: "mint",
+    start: "2026-04-15",
+    end: "2026-05-10",
+    status: "todo",
+    statusText: "예정"
+  }
+];
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const monthNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+const container = document.getElementById('container');
+const viewEnd = new Date(VIEW_START);
+viewEnd.setMonth(viewEnd.getMonth() + VIEW_MONTHS);
+const totalDays = (viewEnd - VIEW_START) / (1000*60*60*24);
+
+function dayOffset(dateStr) {
+  const d = new Date(dateStr);
+  return Math.max(0, Math.min(totalDays, (d - VIEW_START) / (1000*60*60*24)));
+}
+
+function render() {
+  let html = '';
+
+  // 헤더
+  html += '<div class="header"><div class="name-col-header">항목</div><div class="months-header" style="position:relative;">';
+  for (let i = 0; i < VIEW_MONTHS; i++) {
+    const m = new Date(VIEW_START);
+    m.setMonth(m.getMonth() + i);
+    const daysInMonth = new Date(m.getFullYear(), m.getMonth()+1, 0).getDate();
+    html += '<div class="month-block">' + m.getFullYear() + '년 ' + monthNames[m.getMonth()];
+    html += '<div class="days">';
+    for (let d = 1; d <= daysInMonth; d += Math.ceil(daysInMonth/7)) {
+      html += '<span>' + d + '</span>';
+    }
+    html += '</div></div>';
+  }
+
+  // 오늘 표시
+  const today = new Date();
+  const todayOff = (today - VIEW_START) / (1000*60*60*24);
+  if (todayOff >= 0 && todayOff <= totalDays) {
+    const pct = (todayOff / totalDays) * 100;
+    html += '<div class="today-line" style="left:' + pct + '%;"><div class="today-dot"></div></div>';
+  }
+
+  html += '</div></div>';
+
+  // 행
+  tasks.forEach(t => {
+    const startOff = dayOffset(t.start);
+    const endOff = dayOffset(t.end);
+    const leftPct = (startOff / totalDays) * 100;
+    const widthPct = ((endOff - startOff) / totalDays) * 100;
+
+    const statusClass = t.status === 'done' ? 'done' : t.status === 'progress' ? 'progress' : 'todo';
+    const dotColor = t.color === 'pink' ? '#F0B0B0' : t.color === 'peach' ? '#F0C898' : t.color === 'rose' ? '#F0A0C0' : t.color === 'lavender' ? '#C8A8E8' : '#90D8B0';
+
+    html += '<div class="row">';
+    html += '<div class="name-col"><div class="task-icon" style="background:' + dotColor + ';"></div><span class="task-name">' + t.name + '</span></div>';
+    html += '<div class="chart-area">';
+    for (let i = 0; i < VIEW_MONTHS; i++) html += '<div class="chart-col"></div>';
+    html += '<div class="bar-wrap" style="left:' + leftPct + '%;width:' + widthPct + '%;"><div class="bar ' + t.color + '">' + t.name;
+    if (t.statusText) html += '<span class="status ' + statusClass + '">' + t.statusText + '</span>';
+    html += '</div></div>';
+    html += '</div></div>';
+  });
+
+  container.innerHTML = html;
+}
+
+render();
+</script>
+</body>
+</html>
