@@ -10,57 +10,80 @@
 body {
   font-family: 'Noto Sans KR', sans-serif;
   background: #fff;
+  padding: 12px 0;
   overflow-x: auto;
 }
 
-.container { min-width: 700px; }
-
-/* ── 헤더: 월 표시 ── */
-.header {
-  display: flex;
-  border-bottom: 1px solid #F0E0E0;
+/* ── 툴바 ── */
+.toolbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 14px 10px;
+  max-width: 100%;
 }
+.toolbar-btn {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 11px; font-weight: 400;
+  color: #9E7070;
+  background: rgba(255, 240, 240, 0.5);
+  border: 1px solid rgba(240, 200, 200, 0.3);
+  border-radius: 6px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.toolbar-btn:hover { background: rgba(255, 225, 225, 0.6); color: #7A5050; }
+.toolbar-btn.danger { color: #C06060; }
+.toolbar-btn.danger:hover { background: rgba(255, 200, 200, 0.4); }
+
+.month-nav {
+  display: flex; align-items: center; gap: 4px;
+  margin-left: auto;
+}
+.nav-btn {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  color: #B09090;
+  background: none; border: none;
+  cursor: pointer; padding: 4px 8px;
+  border-radius: 4px;
+}
+.nav-btn:hover { background: rgba(255, 240, 240, 0.5); }
+.nav-label { font-size: 11px; color: #9E7070; min-width: 50px; text-align: center; }
+
+/* ── 컨테이너 ── */
+.container { min-width: 650px; position: relative; }
+
+/* ── 헤더 ── */
+.header { display: flex; border-bottom: 1px solid #F0E0E0; }
 .name-col-header {
-  min-width: 160px; max-width: 160px;
-  padding: 10px 14px;
+  min-width: 150px; max-width: 150px;
+  padding: 8px 14px;
   font-size: 11px; font-weight: 500;
   color: #B09090;
 }
-.months-header {
-  flex: 1; display: flex;
-  position: relative;
-}
+.months-header { flex: 1; display: flex; position: relative; }
 .month-block {
-  flex: 1;
-  text-align: center;
-  padding: 8px 0;
+  flex: 1; text-align: center;
+  padding: 6px 0 4px;
   font-size: 11px; font-weight: 500;
   color: #9E7070;
   border-left: 1px solid #F5EAEA;
-  position: relative;
 }
 .month-block .days {
   display: flex; justify-content: space-between;
-  padding: 2px 4px 0;
+  padding: 2px 6px 0;
   font-size: 9px; font-weight: 300;
   color: #C8B0B0;
 }
-
-/* ── 오늘 표시 ── */
 .today-line {
-  position: absolute;
-  top: 0; bottom: 0;
-  width: 2px;
-  background: #E88E8E;
-  z-index: 10;
-  pointer-events: none;
+  position: absolute; top: 39px; bottom: 0;
+  width: 1px; background: #E88E8E;
+  z-index: 10; pointer-events: none;
 }
 .today-dot {
-  position: absolute;
-  top: -3px; left: -4px;
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  background: #E88E8E;
+  position: absolute; top: 39px; left: -3px;
+  width: 7px; height: 7px;
+  border-radius: 50%; background: #E88E8E;
 }
 
 /* ── 행 ── */
@@ -69,211 +92,367 @@ body {
   border-bottom: 1px solid #FAF2F2;
   min-height: 40px;
   transition: background 0.15s;
+  position: relative;
 }
-.row:hover { background: rgba(255, 240, 240, 0.3); }
+.row:hover { background: rgba(255, 240, 240, 0.15); }
+.row.selected { background: rgba(255, 230, 230, 0.3); }
 
 .name-col {
-  min-width: 160px; max-width: 160px;
-  padding: 8px 14px;
-  display: flex; align-items: center; gap: 8px;
+  min-width: 150px; max-width: 150px;
+  padding: 8px 10px 8px 14px;
+  display: flex; align-items: center; gap: 6px;
   border-right: 1px solid #F5EAEA;
+  cursor: pointer;
 }
 .task-icon {
   width: 8px; height: 8px;
   border-radius: 50%; flex-shrink: 0;
+  cursor: pointer;
 }
 .task-name {
   font-size: 12px; color: #5C3A3A;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  flex: 1;
+}
+.task-name-input {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 12px; color: #5C3A3A;
+  border: none; outline: none;
+  background: rgba(255, 240, 240, 0.5);
+  border-radius: 3px;
+  padding: 1px 4px;
+  width: 100%;
 }
 
-.chart-area {
-  flex: 1; position: relative;
-  display: flex;
-}
-.chart-col {
-  flex: 1;
-  border-left: 1px solid #FAF2F2;
-}
+.chart-area { flex: 1; position: relative; display: flex; }
+.chart-col { flex: 1; border-left: 1px solid #FAF2F2; }
 
 /* ── 바 ── */
 .bar-wrap {
   position: absolute;
   top: 6px; height: 28px;
   z-index: 5;
+  cursor: pointer;
 }
 .bar {
   height: 100%;
   border-radius: 6px;
   display: flex; align-items: center;
-  padding: 0 10px;
+  padding: 0 8px;
   font-size: 10px; font-weight: 400;
   white-space: nowrap; overflow: hidden;
-  cursor: default;
-  transition: filter 0.2s;
+  transition: filter 0.15s;
 }
 .bar:hover { filter: brightness(0.95); }
 
-/* 색상 프리셋 */
-.bar.pink {
-  background: linear-gradient(90deg, #FFDDE4, #FFD0D0);
-  color: #9E5050;
-  border: 1px solid rgba(240, 180, 180, 0.4);
-}
-.bar.peach {
-  background: linear-gradient(90deg, #FFE8CC, #FFDDB8);
-  color: #8E6840;
-  border: 1px solid rgba(240, 200, 160, 0.4);
-}
-.bar.rose {
-  background: linear-gradient(90deg, #FFE0EC, #FFD0E0);
-  color: #9E4870;
-  border: 1px solid rgba(240, 170, 200, 0.4);
-}
-.bar.lavender {
-  background: linear-gradient(90deg, #F0E0FF, #E8D4F8);
-  color: #7850A0;
-  border: 1px solid rgba(200, 170, 240, 0.4);
-}
-.bar.mint {
-  background: linear-gradient(90deg, #D8F5E8, #C8F0DC);
-  color: #408060;
-  border: 1px solid rgba(160, 220, 190, 0.4);
-}
+.bar.pink { background: linear-gradient(90deg, #FFDDE4, #FFD0D0); color: #9E5050; border: 1px solid rgba(240,180,180,0.4); }
+.bar.peach { background: linear-gradient(90deg, #FFE8CC, #FFDDB8); color: #8E6840; border: 1px solid rgba(240,200,160,0.4); }
+.bar.rose { background: linear-gradient(90deg, #FFE0EC, #FFD0E0); color: #9E4870; border: 1px solid rgba(240,170,200,0.4); }
+.bar.lavender { background: linear-gradient(90deg, #F0E0FF, #E8D4F8); color: #7850A0; border: 1px solid rgba(200,170,240,0.4); }
+.bar.mint { background: linear-gradient(90deg, #D8F5E8, #C8F0DC); color: #408060; border: 1px solid rgba(160,220,190,0.4); }
 
-/* 상태 뱃지 */
 .status {
   font-size: 9px; font-weight: 500;
-  padding: 1px 6px;
-  border-radius: 3px;
-  margin-left: 6px;
-  flex-shrink: 0;
+  padding: 1px 6px; border-radius: 3px;
+  margin-left: 6px; flex-shrink: 0;
 }
-.status.done { background: rgba(100, 180, 130, 0.2); color: #408060; }
-.status.progress { background: rgba(232, 158, 120, 0.2); color: #A06840; }
-.status.todo { background: rgba(180, 160, 200, 0.2); color: #7060A0; }
+.status.done { background: rgba(100,180,130,0.2); color: #408060; }
+.status.progress { background: rgba(232,158,120,0.2); color: #A06840; }
+.status.todo { background: rgba(180,160,200,0.2); color: #7060A0; }
+
+/* ── 편집 패널 ── */
+.edit-panel {
+  display: none;
+  padding: 12px 14px;
+  background: #FFFAFA;
+  border-top: 1px solid #F0E0E0;
+  border-bottom: 1px solid #F0E0E0;
+}
+.edit-panel.open { display: block; }
+.edit-row {
+  display: flex; align-items: center; gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.edit-row:last-child { margin-bottom: 0; }
+.edit-label {
+  font-size: 10px; color: #B09090;
+  min-width: 40px;
+}
+.edit-input {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 12px; color: #5C3A3A;
+  border: 1px solid #F0E0E0;
+  border-radius: 6px;
+  padding: 4px 8px;
+  outline: none;
+  background: #fff;
+}
+.edit-input:focus { border-color: #E8A0A0; }
+
+.color-option {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.color-option:hover { transform: scale(1.15); }
+.color-option.selected { border-color: #C06060; }
+
+.status-option {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 10px; font-weight: 400;
+  padding: 3px 10px;
+  border-radius: 4px;
+  border: 1px solid #F0E0E0;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: #9E7070;
+}
+.status-option:hover { background: #FFF5F5; }
+.status-option.selected { border-color: #D4847E; color: #D4847E; background: rgba(212,132,126,0.08); }
 </style>
 </head>
 <body>
+
+<div class="toolbar">
+  <button class="toolbar-btn" id="addBtn">+ 추가</button>
+  <button class="toolbar-btn danger" id="deleteBtn">삭제</button>
+  <div class="month-nav">
+    <button class="nav-btn" id="prevMonth">←</button>
+    <span class="nav-label" id="navLabel"></span>
+    <button class="nav-btn" id="nextMonth">→</button>
+  </div>
+</div>
+
 <div class="container" id="container"></div>
+<div class="edit-panel" id="editPanel"></div>
 
 <script>
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 여기서 수정하세요
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-// 표시할 시작 월 (year, month: 0-11)
-const VIEW_START = new Date(2026, 2, 1);  // 2026년 3월
-const VIEW_MONTHS = 4;                     // 표시할 월 수
-
-// 항목들
-// color: pink, peach, rose, lavender, mint
-// status: done(완료), progress(진행중), todo(예정)
-const tasks = [
-  {
-    name: "스드머 촬드크",
-    color: "pink",
-    start: "2026-03-05",
-    end: "2026-03-20",
-    status: "progress",
-    statusText: "진행중"
-  },
-  {
-    name: "신청_할금금 예약",
-    color: "peach",
-    start: "2026-03-18",
-    end: "2026-04-05",
-    status: "todo",
-    statusText: "진행중"
-  },
-  {
-    name: "컨셉 기획",
-    color: "rose",
-    start: "2026-03-01",
-    end: "2026-03-12",
-    status: "done",
-    statusText: "완료"
-  },
-  {
-    name: "촬영 진행",
-    color: "lavender",
-    start: "2026-04-01",
-    end: "2026-04-20",
-    status: "todo",
-    statusText: "예정"
-  },
-  {
-    name: "보정 및 편집",
-    color: "mint",
-    start: "2026-04-15",
-    end: "2026-05-10",
-    status: "todo",
-    statusText: "예정"
-  }
-];
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+const COLORS = {
+  pink: '#F0B0B0', peach: '#F0C898', rose: '#F0A0C0',
+  lavender: '#C8A8E8', mint: '#90D8B0'
+};
+const STATUS_MAP = {
+  done: { text: '완료', cls: 'done' },
+  progress: { text: '진행중', cls: 'progress' },
+  todo: { text: '예정', cls: 'todo' }
+};
 const monthNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
-const container = document.getElementById('container');
-const viewEnd = new Date(VIEW_START);
-viewEnd.setMonth(viewEnd.getMonth() + VIEW_MONTHS);
-const totalDays = (viewEnd - VIEW_START) / (1000*60*60*24);
 
-function dayOffset(dateStr) {
-  const d = new Date(dateStr);
-  return Math.max(0, Math.min(totalDays, (d - VIEW_START) / (1000*60*60*24)));
+// ── 기본 데이터 ──
+const defaultTasks = [
+  { id: 1, name: "기획", color: "pink", start: "2026-04-01", end: "2026-04-15", status: "progress" },
+  { id: 2, name: "디자인", color: "rose", start: "2026-04-10", end: "2026-04-28", status: "todo" },
+  { id: 3, name: "개발", color: "lavender", start: "2026-05-01", end: "2026-05-25", status: "todo" },
+];
+
+let tasks = [];
+let selectedId = null;
+let viewStart = new Date(2026, 3, 1);
+const VIEW_MONTHS = 3;
+
+// ── 저장/불러오기 ──
+function save() {
+  try { localStorage.setItem('tl_tasks', JSON.stringify(tasks)); } catch(e) {}
+}
+function load() {
+  try {
+    const d = localStorage.getItem('tl_tasks');
+    if (d) { tasks = JSON.parse(d); return; }
+  } catch(e) {}
+  tasks = JSON.parse(JSON.stringify(defaultTasks));
 }
 
+function getViewEnd() {
+  const e = new Date(viewStart);
+  e.setMonth(e.getMonth() + VIEW_MONTHS);
+  return e;
+}
+function getTotalDays() {
+  return (getViewEnd() - viewStart) / (864e5);
+}
+function dayOffset(dateStr) {
+  const d = new Date(dateStr);
+  return Math.max(0, Math.min(getTotalDays(), (d - viewStart) / 864e5));
+}
+function fmt(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+// ── 렌더 ──
 function render() {
+  const container = document.getElementById('container');
+  const totalDays = getTotalDays();
   let html = '';
 
   // 헤더
   html += '<div class="header"><div class="name-col-header">항목</div><div class="months-header" style="position:relative;">';
   for (let i = 0; i < VIEW_MONTHS; i++) {
-    const m = new Date(VIEW_START);
+    const m = new Date(viewStart);
     m.setMonth(m.getMonth() + i);
-    const daysInMonth = new Date(m.getFullYear(), m.getMonth()+1, 0).getDate();
+    const dim = new Date(m.getFullYear(), m.getMonth()+1, 0).getDate();
     html += '<div class="month-block">' + m.getFullYear() + '년 ' + monthNames[m.getMonth()];
     html += '<div class="days">';
-    for (let d = 1; d <= daysInMonth; d += Math.ceil(daysInMonth/7)) {
-      html += '<span>' + d + '</span>';
-    }
+    for (let d = 1; d <= dim; d += Math.ceil(dim/7)) html += '<span>' + d + '</span>';
     html += '</div></div>';
   }
-
-  // 오늘 표시
   const today = new Date();
-  const todayOff = (today - VIEW_START) / (1000*60*60*24);
-  if (todayOff >= 0 && todayOff <= totalDays) {
-    const pct = (todayOff / totalDays) * 100;
-    html += '<div class="today-line" style="left:' + pct + '%;"><div class="today-dot"></div></div>';
-  }
-
+  const todayOff = (today - viewStart) / 864e5;
   html += '</div></div>';
 
   // 행
   tasks.forEach(t => {
-    const startOff = dayOffset(t.start);
-    const endOff = dayOffset(t.end);
-    const leftPct = (startOff / totalDays) * 100;
-    const widthPct = ((endOff - startOff) / totalDays) * 100;
+    const s = dayOffset(t.start), e = dayOffset(t.end);
+    const lp = (s/totalDays)*100, wp = ((e-s)/totalDays)*100;
+    const st = STATUS_MAP[t.status] || STATUS_MAP.todo;
+    const sel = t.id === selectedId ? ' selected' : '';
 
-    const statusClass = t.status === 'done' ? 'done' : t.status === 'progress' ? 'progress' : 'todo';
-    const dotColor = t.color === 'pink' ? '#F0B0B0' : t.color === 'peach' ? '#F0C898' : t.color === 'rose' ? '#F0A0C0' : t.color === 'lavender' ? '#C8A8E8' : '#90D8B0';
-
-    html += '<div class="row">';
-    html += '<div class="name-col"><div class="task-icon" style="background:' + dotColor + ';"></div><span class="task-name">' + t.name + '</span></div>';
+    html += '<div class="row' + sel + '" data-id="' + t.id + '">';
+    html += '<div class="name-col" onclick="selectTask(' + t.id + ')">';
+    html += '<div class="task-icon" style="background:' + COLORS[t.color] + ';"></div>';
+    html += '<span class="task-name">' + t.name + '</span></div>';
     html += '<div class="chart-area">';
     for (let i = 0; i < VIEW_MONTHS; i++) html += '<div class="chart-col"></div>';
-    html += '<div class="bar-wrap" style="left:' + leftPct + '%;width:' + widthPct + '%;"><div class="bar ' + t.color + '">' + t.name;
-    if (t.statusText) html += '<span class="status ' + statusClass + '">' + t.statusText + '</span>';
-    html += '</div></div>';
+    if (wp > 0.5) {
+      html += '<div class="bar-wrap" style="left:' + lp + '%;width:' + wp + '%;" onclick="selectTask(' + t.id + ')">';
+      html += '<div class="bar ' + t.color + '">' + t.name;
+      html += '<span class="status ' + st.cls + '">' + st.text + '</span>';
+      html += '</div></div>';
+    }
     html += '</div></div>';
   });
 
+  // 오늘 라인 (전체 높이)
+  if (todayOff >= 0 && todayOff <= totalDays) {
+    html += '<div class="today-line" id="todayLine"><div class="today-dot"></div></div>';
+  }
+
   container.innerHTML = html;
+
+  // 오늘 라인: 헤더 월 칸 기준으로 정확히 배치
+  const todayLine = document.getElementById('todayLine');
+  if (todayLine) {
+    const monthBlocks = container.querySelectorAll('.month-block');
+    const containerRect = container.getBoundingClientRect();
+    // 오늘이 어느 월, 며칠째인지 계산
+    let daysCount = 0;
+    for (let i = 0; i < VIEW_MONTHS; i++) {
+      const m = new Date(viewStart);
+      m.setMonth(m.getMonth() + i);
+      const dim = new Date(m.getFullYear(), m.getMonth()+1, 0).getDate();
+      if (todayOff < daysCount + dim) {
+        const dayInMonth = todayOff - daysCount;
+        const blockRect = monthBlocks[i].getBoundingClientRect();
+        const x = blockRect.left - containerRect.left + (dayInMonth / dim) * blockRect.width;
+        todayLine.style.left = x + 'px';
+        break;
+      }
+      daysCount += dim;
+    }
+  }
+  document.getElementById('navLabel').textContent =
+    viewStart.getFullYear() + '.' + String(viewStart.getMonth()+1).padStart(2,'0');
+  renderEditPanel();
 }
 
+function selectTask(id) {
+  selectedId = selectedId === id ? null : id;
+  render();
+}
+
+function renderEditPanel() {
+  const panel = document.getElementById('editPanel');
+  if (!selectedId) { panel.classList.remove('open'); return; }
+  const t = tasks.find(x => x.id === selectedId);
+  if (!t) { panel.classList.remove('open'); return; }
+
+  let html = '<div class="edit-row">';
+  html += '<span class="edit-label">이름</span>';
+  html += '<input class="edit-input" id="editName" value="' + t.name + '" style="width:140px;" />';
+  html += '</div>';
+
+  html += '<div class="edit-row">';
+  html += '<span class="edit-label">기간</span>';
+  html += '<input class="edit-input" id="editStart" type="date" value="' + t.start + '" />';
+  html += '<span style="color:#C8B0B0;">~</span>';
+  html += '<input class="edit-input" id="editEnd" type="date" value="' + t.end + '" />';
+  html += '</div>';
+
+  html += '<div class="edit-row">';
+  html += '<span class="edit-label">색상</span>';
+  Object.keys(COLORS).forEach(c => {
+    const sel = c === t.color ? ' selected' : '';
+    html += '<div class="color-option' + sel + '" style="background:' + COLORS[c] + ';" onclick="setColor(\'' + c + '\')"></div>';
+  });
+  html += '</div>';
+
+  html += '<div class="edit-row">';
+  html += '<span class="edit-label">상태</span>';
+  Object.keys(STATUS_MAP).forEach(s => {
+    const sel = s === t.status ? ' selected' : '';
+    html += '<button class="status-option' + sel + '" onclick="setStatus(\'' + s + '\')">' + STATUS_MAP[s].text + '</button>';
+  });
+  html += '</div>';
+
+  panel.innerHTML = html;
+  panel.classList.add('open');
+
+  document.getElementById('editName').onchange = e => {
+    t.name = e.target.value; save(); render();
+  };
+  document.getElementById('editStart').onchange = e => {
+    t.start = e.target.value; save(); render();
+  };
+  document.getElementById('editEnd').onchange = e => {
+    t.end = e.target.value; save(); render();
+  };
+}
+
+window.setColor = c => {
+  const t = tasks.find(x => x.id === selectedId);
+  if (t) { t.color = c; save(); render(); }
+};
+window.setStatus = s => {
+  const t = tasks.find(x => x.id === selectedId);
+  if (t) { t.status = s; save(); render(); }
+};
+window.selectTask = selectTask;
+
+// ── 추가/삭제 ──
+document.getElementById('addBtn').onclick = () => {
+  const today = new Date();
+  const end = new Date(today); end.setDate(end.getDate() + 14);
+  const id = Date.now();
+  tasks.push({
+    id, name: '새 항목', color: 'pink',
+    start: fmt(today), end: fmt(end), status: 'todo'
+  });
+  selectedId = id;
+  save(); render();
+};
+
+document.getElementById('deleteBtn').onclick = () => {
+  if (!selectedId) return;
+  tasks = tasks.filter(x => x.id !== selectedId);
+  selectedId = null;
+  save(); render();
+};
+
+// ── 월 이동 ──
+document.getElementById('prevMonth').onclick = () => {
+  viewStart.setMonth(viewStart.getMonth() - 1);
+  render();
+};
+document.getElementById('nextMonth').onclick = () => {
+  viewStart.setMonth(viewStart.getMonth() + 1);
+  render();
+};
+
+// ── 초기화 ──
+load();
 render();
 </script>
 </body>
