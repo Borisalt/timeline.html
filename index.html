@@ -6,454 +6,329 @@
 <title>Timeline</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500&display=swap');
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: 'Noto Sans KR', sans-serif;
-  background: #fff;
-  padding: 12px 0;
-  overflow-x: auto;
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans KR',sans-serif;background:#fff;}
+
+.toolbar{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #F0E8E8;}
+.tb{font-family:'Noto Sans KR',sans-serif;font-size:11px;color:#9E7070;background:rgba(255,240,240,0.5);border:1px solid rgba(240,200,200,0.3);border-radius:6px;padding:5px 12px;cursor:pointer;}
+.tb:hover{background:rgba(255,225,225,0.6);color:#7A5050;}
+.tb.danger{color:#C06060;}
+.nav-group{display:flex;align-items:center;gap:4px;}
+.nav-btn{font-size:13px;color:#B09090;background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:4px;}
+.nav-btn:hover{background:rgba(255,240,240,0.5);}
+.nav-label{font-size:11px;color:#9E7070;min-width:80px;text-align:center;}
+
+.wrap{display:flex;overflow-x:auto;position:relative;}
+
+/* 왼쪽 고정 열 */
+.left-col{min-width:160px;max-width:160px;flex-shrink:0;position:sticky;left:0;z-index:20;background:#fff;}
+.left-hd{height:50px;border-bottom:1px solid #F0E8E8;border-right:1px solid #F0E8E8;padding:8px 12px;display:flex;align-items:flex-end;}
+.left-hd span{font-size:10px;color:#B0A0A0;}
+.left-row{display:flex;align-items:center;gap:6px;padding:0 12px;height:36px;border-bottom:1px solid #FAF4F4;border-right:1px solid #F0E8E8;cursor:pointer;}
+.left-row:hover{background:rgba(255,240,240,0.2);}
+.left-icon{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.left-name{font-size:11px;color:#4A3535;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
+.left-name-input{font-family:'Noto Sans KR',sans-serif;font-size:11px;color:#4A3535;border:none;outline:none;background:rgba(255,240,240,0.4);border-radius:3px;padding:1px 4px;width:100%;}
+.left-status{font-size:8px;padding:1px 5px;border-radius:3px;flex-shrink:0;}
+.left-status.done{background:rgba(100,180,130,0.15);color:#408060;}
+.left-status.progress{background:rgba(232,158,120,0.15);color:#A06840;}
+.left-status.todo{background:rgba(180,160,200,0.15);color:#7060A0;}
+.left-add{height:28px;display:flex;align-items:center;padding:0 12px;border-right:1px solid #F0E8E8;}
+.left-add span{font-size:10px;color:#C8B0B0;cursor:pointer;}
+.left-add span:hover{color:#9E7070;}
+.left-cat-row{display:flex;align-items:center;gap:6px;padding:0 12px;height:28px;border-bottom:1px solid #F0E8E8;border-right:1px solid #F0E8E8;background:#FEFAFA;}
+.left-cat-name{font-size:10px;font-weight:500;color:#8A6060;cursor:pointer;flex:1;}
+.left-cat-input{font-family:'Noto Sans KR',sans-serif;font-size:10px;font-weight:500;color:#8A6060;border:none;outline:none;background:rgba(255,230,230,0.4);border-radius:3px;padding:1px 4px;width:80px;}
+
+/* 오른쪽 차트 */
+.right-col{flex:1;position:relative;}
+.day-w{28px;}
+
+/* 헤더 */
+.chart-hd{height:50px;display:flex;flex-direction:column;border-bottom:1px solid #F0E8E8;position:relative;}
+.month-row{display:flex;height:22px;}
+.month-span{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#9E7070;border-left:1px solid #F0E8E8;}
+.day-row{display:flex;height:28px;}
+.day-cell{width:28px;min-width:28px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#C0B0B0;border-left:1px solid #FAF4F4;position:relative;}
+.day-cell.first{border-left:1px solid #F0E8E8;}
+.day-cell.sun{color:#E0A0A0;}
+.day-cell.today-cell{color:transparent;}
+
+/* 오늘 마커 */
+.today-marker{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:22px;height:22px;border-radius:50%;
+  background:#E88E8E;color:#fff;
+  font-size:9px;font-weight:500;
+  display:flex;align-items:center;justify-content:center;
+  z-index:15;
 }
 
-/* ── 툴바 ── */
-.toolbar {
-  display: flex; align-items: center; gap: 8px;
-  padding: 0 14px 10px;
-  max-width: 100%;
-}
-.toolbar-btn {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 11px; font-weight: 400;
-  color: #9E7070;
-  background: rgba(255, 240, 240, 0.5);
-  border: 1px solid rgba(240, 200, 200, 0.3);
-  border-radius: 6px;
-  padding: 5px 12px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.toolbar-btn:hover { background: rgba(255, 225, 225, 0.6); color: #7A5050; }
-.toolbar-btn.danger { color: #C06060; }
-.toolbar-btn.danger:hover { background: rgba(255, 200, 200, 0.4); }
+/* 차트 행 */
+.chart-row{display:flex;height:36px;position:relative;}
+.chart-cell{width:28px;min-width:28px;border-left:1px solid #FAF4F4;border-bottom:1px solid #FAF4F4;}
+.chart-cell.first{border-left:1px solid #F0E8E8;}
 
-.month-nav {
-  display: flex; align-items: center; gap: 4px;
-  margin-left: auto;
-}
-.nav-btn {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 13px;
-  color: #B09090;
-  background: none; border: none;
-  cursor: pointer; padding: 4px 8px;
-  border-radius: 4px;
-}
-.nav-btn:hover { background: rgba(255, 240, 240, 0.5); }
-.nav-label { font-size: 11px; color: #9E7070; min-width: 50px; text-align: center; }
+.chart-cat-row{display:flex;height:28px;}
+.chart-cat-cell{width:28px;min-width:28px;border-left:1px solid #FAF4F4;border-bottom:1px solid #F0E8E8;background:#FEFAFA;}
+.chart-cat-cell.first{border-left:1px solid #F0E8E8;}
 
-/* ── 컨테이너 ── */
-.container { min-width: 650px; position: relative; }
+.chart-add-row{display:flex;height:28px;}
 
-/* ── 헤더 ── */
-.header { display: flex; border-bottom: 1px solid #F0E0E0; }
-.name-col-header {
-  min-width: 150px; max-width: 150px;
-  padding: 8px 14px;
-  font-size: 11px; font-weight: 500;
-  color: #B09090;
-}
-.months-header { flex: 1; display: flex; position: relative; }
-.month-block {
-  flex: 1; text-align: center;
-  padding: 6px 0 4px;
-  font-size: 11px; font-weight: 500;
-  color: #9E7070;
-  border-left: 1px solid #F5EAEA;
-}
-.month-block .days {
-  display: flex; justify-content: space-between;
-  padding: 2px 6px 0;
-  font-size: 9px; font-weight: 300;
-  color: #C8B0B0;
-}
-.today-line {
-  position: absolute; top: 39px; bottom: 0;
-  width: 1px; background: #E88E8E;
-  z-index: 10; pointer-events: none;
-}
-.today-dot {
-  position: absolute; top: 39px; left: -3px;
-  width: 7px; height: 7px;
-  border-radius: 50%; background: #E88E8E;
-}
+/* 바 */
+.bar-layer{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:5;}
+.task-bar{position:absolute;top:7px;height:22px;border-radius:5px;display:flex;align-items:center;padding:0 6px;font-size:9px;white-space:nowrap;overflow:hidden;pointer-events:auto;cursor:pointer;transition:filter .15s;}
+.task-bar:hover{filter:brightness(0.93);}
+.task-bar.pink{background:linear-gradient(90deg,#FFDDE4,#FFD0D0);color:#9E5050;border:1px solid rgba(240,180,180,0.4);}
+.task-bar.peach{background:linear-gradient(90deg,#FFE8CC,#FFDDB8);color:#8E6840;border:1px solid rgba(240,200,160,0.4);}
+.task-bar.rose{background:linear-gradient(90deg,#FFE0EC,#FFD0E0);color:#9E4870;border:1px solid rgba(240,170,200,0.4);}
+.task-bar.lavender{background:linear-gradient(90deg,#F0E0FF,#E8D4F8);color:#7850A0;border:1px solid rgba(200,170,240,0.4);}
+.task-bar.mint{background:linear-gradient(90deg,#D8F5E8,#C8F0DC);color:#408060;border:1px solid rgba(160,220,190,0.4);}
+.task-bar.selected{outline:2px solid #E88E8E;outline-offset:1px;}
+.bar-status{font-size:7px;font-weight:500;padding:1px 4px;border-radius:3px;margin-left:3px;flex-shrink:0;}
+.bar-status.done{background:rgba(100,180,130,0.2);color:#408060;}
+.bar-status.progress{background:rgba(232,158,120,0.2);color:#A06840;}
+.bar-status.todo{background:rgba(180,160,200,0.2);color:#7060A0;}
 
-/* ── 행 ── */
-.row {
-  display: flex;
-  border-bottom: 1px solid #FAF2F2;
-  min-height: 40px;
-  transition: background 0.15s;
-  position: relative;
-}
-.row:hover { background: rgba(255, 240, 240, 0.15); }
-.row.selected { background: rgba(255, 230, 230, 0.3); }
+/* 오늘 세로선 */
+.today-vline{position:absolute;top:0;bottom:0;width:1px;background:#E88E8E;z-index:10;pointer-events:none;}
 
-.name-col {
-  min-width: 150px; max-width: 150px;
-  padding: 8px 10px 8px 14px;
-  display: flex; align-items: center; gap: 6px;
-  border-right: 1px solid #F5EAEA;
-  cursor: pointer;
-}
-.task-icon {
-  width: 8px; height: 8px;
-  border-radius: 50%; flex-shrink: 0;
-  cursor: pointer;
-}
-.task-name {
-  font-size: 12px; color: #5C3A3A;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  flex: 1;
-}
-.task-name-input {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 12px; color: #5C3A3A;
-  border: none; outline: none;
-  background: rgba(255, 240, 240, 0.5);
-  border-radius: 3px;
-  padding: 1px 4px;
-  width: 100%;
-}
-
-.chart-area { flex: 1; position: relative; display: flex; }
-.chart-col { flex: 1; border-left: 1px solid #FAF2F2; }
-
-/* ── 바 ── */
-.bar-wrap {
-  position: absolute;
-  top: 6px; height: 28px;
-  z-index: 5;
-  cursor: pointer;
-}
-.bar {
-  height: 100%;
-  border-radius: 6px;
-  display: flex; align-items: center;
-  padding: 0 8px;
-  font-size: 10px; font-weight: 400;
-  white-space: nowrap; overflow: hidden;
-  transition: filter 0.15s;
-}
-.bar:hover { filter: brightness(0.95); }
-
-.bar.pink { background: linear-gradient(90deg, #FFDDE4, #FFD0D0); color: #9E5050; border: 1px solid rgba(240,180,180,0.4); }
-.bar.peach { background: linear-gradient(90deg, #FFE8CC, #FFDDB8); color: #8E6840; border: 1px solid rgba(240,200,160,0.4); }
-.bar.rose { background: linear-gradient(90deg, #FFE0EC, #FFD0E0); color: #9E4870; border: 1px solid rgba(240,170,200,0.4); }
-.bar.lavender { background: linear-gradient(90deg, #F0E0FF, #E8D4F8); color: #7850A0; border: 1px solid rgba(200,170,240,0.4); }
-.bar.mint { background: linear-gradient(90deg, #D8F5E8, #C8F0DC); color: #408060; border: 1px solid rgba(160,220,190,0.4); }
-
-.status {
-  font-size: 9px; font-weight: 500;
-  padding: 1px 6px; border-radius: 3px;
-  margin-left: 6px; flex-shrink: 0;
-}
-.status.done { background: rgba(100,180,130,0.2); color: #408060; }
-.status.progress { background: rgba(232,158,120,0.2); color: #A06840; }
-.status.todo { background: rgba(180,160,200,0.2); color: #7060A0; }
-
-/* ── 편집 패널 ── */
-.edit-panel {
-  display: none;
-  padding: 12px 14px;
-  background: #FFFAFA;
-  border-top: 1px solid #F0E0E0;
-  border-bottom: 1px solid #F0E0E0;
-}
-.edit-panel.open { display: block; }
-.edit-row {
-  display: flex; align-items: center; gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
-}
-.edit-row:last-child { margin-bottom: 0; }
-.edit-label {
-  font-size: 10px; color: #B09090;
-  min-width: 40px;
-}
-.edit-input {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 12px; color: #5C3A3A;
-  border: 1px solid #F0E0E0;
-  border-radius: 6px;
-  padding: 4px 8px;
-  outline: none;
-  background: #fff;
-}
-.edit-input:focus { border-color: #E8A0A0; }
-
-.color-option {
-  width: 20px; height: 20px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.color-option:hover { transform: scale(1.15); }
-.color-option.selected { border-color: #C06060; }
-
-.status-option {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 10px; font-weight: 400;
-  padding: 3px 10px;
-  border-radius: 4px;
-  border: 1px solid #F0E0E0;
-  background: #fff;
-  cursor: pointer;
-  transition: all 0.15s;
-  color: #9E7070;
-}
-.status-option:hover { background: #FFF5F5; }
-.status-option.selected { border-color: #D4847E; color: #D4847E; background: rgba(212,132,126,0.08); }
+/* 편집 패널 */
+.edit-panel{display:none;padding:10px 14px;background:#FFFAFA;border-top:1px solid #F0E0E0;}
+.edit-panel.open{display:block;}
+.ep-title{font-size:11px;font-weight:500;color:#9E7070;margin-bottom:8px;}
+.er{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
+.el{font-size:10px;color:#B09090;min-width:36px;}
+.ei{font-family:'Noto Sans KR',sans-serif;font-size:11px;color:#5C3A3A;border:1px solid #F0E0E0;border-radius:5px;padding:3px 7px;outline:none;background:#fff;}
+.ei:focus{border-color:#E8A0A0;}
+.co{width:18px;height:18px;border-radius:50%;border:2px solid transparent;cursor:pointer;}
+.co:hover{transform:scale(1.15);}
+.co.sel{border-color:#C06060;}
+.so{font-family:'Noto Sans KR',sans-serif;font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid #F0E0E0;background:#fff;cursor:pointer;color:#9E7070;}
+.so:hover{background:#FFF5F5;}
+.so.sel{border-color:#D4847E;color:#D4847E;background:rgba(212,132,126,0.08);}
 </style>
 </head>
 <body>
 
 <div class="toolbar">
-  <button class="toolbar-btn" id="addBtn">+ 추가</button>
-  <button class="toolbar-btn danger" id="deleteBtn">삭제</button>
-  <div class="month-nav">
+  <div class="nav-group">
     <button class="nav-btn" id="prevMonth">←</button>
     <span class="nav-label" id="navLabel"></span>
     <button class="nav-btn" id="nextMonth">→</button>
   </div>
+  <button class="tb" id="addCatBtn">+ 항목 추가</button>
+  <button class="tb danger" id="deleteBtn">삭제</button>
 </div>
 
-<div class="container" id="container"></div>
+<div class="wrap" id="wrap"></div>
 <div class="edit-panel" id="editPanel"></div>
 
 <script>
-const COLORS = {
-  pink: '#F0B0B0', peach: '#F0C898', rose: '#F0A0C0',
-  lavender: '#C8A8E8', mint: '#90D8B0'
-};
-const STATUS_MAP = {
-  done: { text: '완료', cls: 'done' },
-  progress: { text: '진행중', cls: 'progress' },
-  todo: { text: '예정', cls: 'todo' }
-};
-const monthNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+const DW=28;
+const COLORS={pink:'#F0B0B0',peach:'#F0C898',rose:'#F0A0C0',lavender:'#C8A8E8',mint:'#90D8B0'};
+const SMAP={done:{t:'완료',c:'done'},progress:{t:'진행중',c:'progress'},todo:{t:'예정',c:'todo'}};
+const MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-// ── 기본 데이터 ──
-const defaultTasks = [
-  { id: 1, name: "기획", color: "pink", start: "2026-04-01", end: "2026-04-15", status: "progress" },
-  { id: 2, name: "디자인", color: "rose", start: "2026-04-10", end: "2026-04-28", status: "todo" },
-  { id: 3, name: "개발", color: "lavender", start: "2026-05-01", end: "2026-05-25", status: "todo" },
-];
+const defaultData=[];
 
-let tasks = [];
-let selectedId = null;
-let viewStart = new Date(2026, 3, 1);
-const VIEW_MONTHS = 3;
+let cats=[], selId=null;
+let viewStart=new Date(2026,3,1);
+const VM=3;
 
-// ── 저장/불러오기 ──
-function save() {
-  try { localStorage.setItem('tl_tasks', JSON.stringify(tasks)); } catch(e) {}
-}
-function load() {
-  try {
-    const d = localStorage.getItem('tl_tasks');
-    if (d) { tasks = JSON.parse(d); return; }
-  } catch(e) {}
-  tasks = JSON.parse(JSON.stringify(defaultTasks));
+function save(){try{localStorage.setItem('tl4',JSON.stringify(cats));}catch(e){}}
+function load(){try{const d=localStorage.getItem('tl4');if(d){cats=JSON.parse(d);return;}}catch(e){}cats=JSON.parse(JSON.stringify(defaultData));}
+function dim(y,m){return new Date(y,m+1,0).getDate();}
+function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function dayOfWeek(y,m,d){return new Date(y,m,d).getDay();}
+
+function getAllDays(){
+  const days=[];
+  for(let i=0;i<VM;i++){
+    const m=new Date(viewStart);m.setMonth(m.getMonth()+i);
+    const y=m.getFullYear(),mo=m.getMonth();
+    const cnt=dim(y,mo);
+    for(let d=1;d<=cnt;d++){
+      days.push({year:y,month:mo,day:d,dow:dayOfWeek(y,mo,d),first:d===1});
+    }
+  }
+  return days;
 }
 
-function getViewEnd() {
-  const e = new Date(viewStart);
-  e.setMonth(e.getMonth() + VIEW_MONTHS);
-  return e;
-}
-function getTotalDays() {
-  return (getViewEnd() - viewStart) / (864e5);
-}
-function dayOffset(dateStr) {
-  const d = new Date(dateStr);
-  return Math.max(0, Math.min(getTotalDays(), (d - viewStart) / 864e5));
-}
-function fmt(d) {
-  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+function dayIndex(dateStr,days){
+  const dt=new Date(dateStr);
+  const y=dt.getFullYear(),m=dt.getMonth(),d=dt.getDate();
+  for(let i=0;i<days.length;i++){
+    if(days[i].year===y&&days[i].month===m&&days[i].day===d)return i;
+  }
+  if(dt<new Date(days[0].year,days[0].month,days[0].day))return -1;
+  return days.length;
 }
 
-// ── 렌더 ──
-function render() {
-  const container = document.getElementById('container');
-  const totalDays = getTotalDays();
-  let html = '';
+function render(){
+  const wrap=document.getElementById('wrap');
+  const days=getAllDays();
+  const totalW=days.length*DW;
+  const today=new Date();
+  const todayStr=fmt(today);
+
+  // ── 왼쪽 열 ──
+  let lh='<div class="left-col">';
+  lh+='<div class="left-hd"><span>항목</span></div>';
+  cats.forEach(cat=>{
+    lh+='<div class="left-cat-row"><span class="left-cat-name" data-id="'+cat.id+'" onclick="editCat('+cat.id+')">'+cat.name+'</span></div>';
+    cat.tasks.forEach(t=>{
+      const st=SMAP[t.status]||SMAP.todo;
+      lh+='<div class="left-row'+(t.id===selId?' selected':'')+'" onclick="sel('+t.id+')">';
+      lh+='<div class="left-icon" style="background:'+COLORS[t.color]+';"></div>';
+      lh+='<span class="left-name">'+t.name+'</span>';
+      lh+='<span class="left-status '+st.c+'">'+st.t+'</span>';
+      lh+='</div>';
+    });
+    lh+='<div class="left-add"><span onclick="addTask('+cat.id+')">+ 추가</span></div>';
+  });
+  lh+='</div>';
+
+  // ── 오른쪽 차트 ──
+  let rh='<div class="right-col" style="width:'+totalW+'px;position:relative;">';
 
   // 헤더
-  html += '<div class="header"><div class="name-col-header">항목</div><div class="months-header" style="position:relative;">';
-  for (let i = 0; i < VIEW_MONTHS; i++) {
-    const m = new Date(viewStart);
-    m.setMonth(m.getMonth() + i);
-    const dim = new Date(m.getFullYear(), m.getMonth()+1, 0).getDate();
-    html += '<div class="month-block">' + m.getFullYear() + '년 ' + monthNames[m.getMonth()];
-    html += '<div class="days">';
-    for (let d = 1; d <= dim; d += Math.ceil(dim/7)) html += '<span>' + d + '</span>';
-    html += '</div></div>';
+  rh+='<div class="chart-hd">';
+  // 월 라벨
+  rh+='<div class="month-row">';
+  let mi=0;
+  while(mi<days.length){
+    const cm=days[mi].month,cy=days[mi].year;
+    let cnt=0;
+    for(let j=mi;j<days.length&&days[j].month===cm&&days[j].year===cy;j++)cnt++;
+    rh+='<div class="month-span" style="width:'+(cnt*DW)+'px;">'+MN[cm]+' '+cy+'</div>';
+    mi+=cnt;
   }
-  const today = new Date();
-  const todayOff = (today - viewStart) / 864e5;
-  html += '</div></div>';
-
-  // 행
-  tasks.forEach(t => {
-    const s = dayOffset(t.start), e = dayOffset(t.end);
-    const lp = (s/totalDays)*100, wp = ((e-s)/totalDays)*100;
-    const st = STATUS_MAP[t.status] || STATUS_MAP.todo;
-    const sel = t.id === selectedId ? ' selected' : '';
-
-    html += '<div class="row' + sel + '" data-id="' + t.id + '">';
-    html += '<div class="name-col" onclick="selectTask(' + t.id + ')">';
-    html += '<div class="task-icon" style="background:' + COLORS[t.color] + ';"></div>';
-    html += '<span class="task-name">' + t.name + '</span></div>';
-    html += '<div class="chart-area">';
-    for (let i = 0; i < VIEW_MONTHS; i++) html += '<div class="chart-col"></div>';
-    if (wp > 0.5) {
-      html += '<div class="bar-wrap" style="left:' + lp + '%;width:' + wp + '%;" onclick="selectTask(' + t.id + ')">';
-      html += '<div class="bar ' + t.color + '">' + t.name;
-      html += '<span class="status ' + st.cls + '">' + st.text + '</span>';
-      html += '</div></div>';
-    }
-    html += '</div></div>';
+  rh+='</div>';
+  // 날짜
+  rh+='<div class="day-row">';
+  days.forEach(d=>{
+    const isToday=(d.year===today.getFullYear()&&d.month===today.getMonth()&&d.day===today.getDate());
+    const cls='day-cell'+(d.first?' first':'')+(d.dow===0?' sun':'')+(isToday?' today-cell':'');
+    rh+='<div class="'+cls+'">';
+    if(isToday)rh+='<div class="today-marker">'+d.day+'</div>';
+    else rh+=d.day;
+    rh+='</div>';
   });
+  rh+='</div></div>';
 
-  // 오늘 라인 (전체 높이)
-  if (todayOff >= 0 && todayOff <= totalDays) {
-    html += '<div class="today-line" id="todayLine"><div class="today-dot"></div></div>';
-  }
+  // 카테고리 + 행
+  cats.forEach(cat=>{
+    // 카테고리 구분줄
+    rh+='<div class="chart-cat-row">';
+    days.forEach(d=>{rh+='<div class="chart-cat-cell'+(d.first?' first':'')+'"></div>';});
+    rh+='</div>';
 
-  container.innerHTML = html;
-
-  // 오늘 라인: 헤더 월 칸 기준으로 정확히 배치
-  const todayLine = document.getElementById('todayLine');
-  if (todayLine) {
-    const monthBlocks = container.querySelectorAll('.month-block');
-    const containerRect = container.getBoundingClientRect();
-    // 오늘이 어느 월, 며칠째인지 계산
-    let daysCount = 0;
-    for (let i = 0; i < VIEW_MONTHS; i++) {
-      const m = new Date(viewStart);
-      m.setMonth(m.getMonth() + i);
-      const dim = new Date(m.getFullYear(), m.getMonth()+1, 0).getDate();
-      if (todayOff < daysCount + dim) {
-        const dayInMonth = todayOff - daysCount;
-        const blockRect = monthBlocks[i].getBoundingClientRect();
-        const x = blockRect.left - containerRect.left + (dayInMonth / dim) * blockRect.width;
-        todayLine.style.left = x + 'px';
-        break;
+    // 태스크 행
+    cat.tasks.forEach(t=>{
+      rh+='<div class="chart-row">';
+      days.forEach(d=>{rh+='<div class="chart-cell'+(d.first?' first':'')+'"></div>';});
+      // 바
+      const si=dayIndex(t.start,days);
+      const ei=dayIndex(t.end,days);
+      if(ei>=0&&si<days.length){
+        const l=Math.max(si,0)*DW;
+        const w=Math.max((Math.min(ei,days.length)-Math.max(si,0))*DW,DW);
+        const st=SMAP[t.status]||SMAP.todo;
+        rh+='<div class="bar-layer"><div class="task-bar '+t.color+(t.id===selId?' selected':'')+'" style="left:'+l+'px;width:'+w+'px;" onclick="sel('+t.id+')">'+t.name;
+        rh+='<span class="bar-status '+st.c+'">'+st.t+'</span>';
+        rh+='</div></div>';
       }
-      daysCount += dim;
-    }
+      rh+='</div>';
+    });
+
+    // 추가 행
+    rh+='<div class="chart-add-row">';
+    days.forEach(()=>{rh+='<div style="width:28px;min-width:28px;display:inline-block;"></div>';});
+    rh+='</div>';
+  });
+
+  // 오늘 세로선
+  const ti=dayIndex(todayStr,days);
+  if(ti>=0&&ti<days.length){
+    const tx=ti*DW+DW/2;
+    rh+='<div class="today-vline" style="left:'+tx+'px;top:50px;"></div>';
   }
-  document.getElementById('navLabel').textContent =
-    viewStart.getFullYear() + '.' + String(viewStart.getMonth()+1).padStart(2,'0');
-  renderEditPanel();
+
+  rh+='</div>';
+
+  wrap.innerHTML=lh+rh;
+
+  // 오늘 위치로 스크롤
+  if(ti>5)wrap.scrollLeft=(ti-5)*DW;
+
+  document.getElementById('navLabel').textContent=viewStart.getFullYear()+'. '+String(viewStart.getMonth()+1).padStart(2,'0');
+  renderEdit();
 }
 
-function selectTask(id) {
-  selectedId = selectedId === id ? null : id;
-  render();
+window.sel=id=>{selId=(selId===id?null:id);render();};
+
+window.editCat=id=>{
+  const cat=cats.find(c=>c.id===id);if(!cat)return;
+  const els=document.querySelectorAll('.left-cat-name');
+  els.forEach(el=>{
+    if(el.getAttribute('data-id')==String(id)){
+      const inp=document.createElement('input');
+      inp.className='left-cat-input';inp.value=cat.name;
+      el.replaceWith(inp);inp.focus();inp.select();
+      const done=()=>{cat.name=inp.value||cat.name;save();render();};
+      inp.onblur=done;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();done();}};
+    }
+  });
+};
+
+window.addTask=cid=>{
+  const cat=cats.find(c=>c.id===cid);if(!cat)return;
+  const t=new Date(),e=new Date(t);e.setDate(e.getDate()+7);
+  const id=Date.now();
+  cat.tasks.push({id,name:'새 일정',color:'pink',start:fmt(t),end:fmt(e),status:'todo'});
+  selId=id;save();render();
+};
+
+document.getElementById('addCatBtn').onclick=()=>{
+  cats.push({id:Date.now(),name:'새 항목',tasks:[]});save();render();
+};
+document.getElementById('deleteBtn').onclick=()=>{
+  if(!selId)return;
+  cats.forEach(c=>{c.tasks=c.tasks.filter(t=>t.id!==selId);});
+  selId=null;save();render();
+};
+
+function renderEdit(){
+  const panel=document.getElementById('editPanel');
+  if(!selId){panel.classList.remove('open');return;}
+  let task=null;
+  cats.forEach(c=>c.tasks.forEach(t=>{if(t.id===selId)task=t;}));
+  if(!task){panel.classList.remove('open');return;}
+  let h='<div class="ep-title">일정 수정</div>';
+  h+='<div class="er"><span class="el">이름</span><input class="ei" id="eName" value="'+task.name+'" style="width:130px;"/></div>';
+  h+='<div class="er"><span class="el">시작</span><input class="ei" id="eStart" type="date" value="'+task.start+'"/>';
+  h+='<span style="color:#C8B0B0;margin:0 2px;">~</span>';
+  h+='<span class="el">종료</span><input class="ei" id="eEnd" type="date" value="'+task.end+'"/></div>';
+  h+='<div class="er"><span class="el">색상</span>';
+  Object.keys(COLORS).forEach(c=>{h+='<div class="co'+(c===task.color?' sel':'')+'" style="background:'+COLORS[c]+';" onclick="setC(\''+c+'\')"></div>';});
+  h+='</div>';
+  h+='<div class="er"><span class="el">상태</span>';
+  Object.keys(SMAP).forEach(s=>{h+='<button class="so'+(s===task.status?' sel':'')+'" onclick="setS(\''+s+'\')">'+SMAP[s].t+'</button>';});
+  h+='</div>';
+  panel.innerHTML=h;panel.classList.add('open');
+  const bind=(id,fn)=>{document.getElementById(id).onchange=e=>fn(e.target.value);};
+  bind('eName',v=>{task.name=v;save();render();});
+  bind('eStart',v=>{task.start=v;save();render();});
+  bind('eEnd',v=>{task.end=v;save();render();});
 }
+window.setC=c=>{let t;cats.forEach(ca=>ca.tasks.forEach(x=>{if(x.id===selId)t=x;}));if(t){t.color=c;save();render();}};
+window.setS=s=>{let t;cats.forEach(ca=>ca.tasks.forEach(x=>{if(x.id===selId)t=x;}));if(t){t.status=s;save();render();}};
 
-function renderEditPanel() {
-  const panel = document.getElementById('editPanel');
-  if (!selectedId) { panel.classList.remove('open'); return; }
-  const t = tasks.find(x => x.id === selectedId);
-  if (!t) { panel.classList.remove('open'); return; }
+document.getElementById('prevMonth').onclick=()=>{viewStart.setMonth(viewStart.getMonth()-1);render();};
+document.getElementById('nextMonth').onclick=()=>{viewStart.setMonth(viewStart.getMonth()+1);render();};
 
-  let html = '<div class="edit-row">';
-  html += '<span class="edit-label">이름</span>';
-  html += '<input class="edit-input" id="editName" value="' + t.name + '" style="width:140px;" />';
-  html += '</div>';
-
-  html += '<div class="edit-row">';
-  html += '<span class="edit-label">기간</span>';
-  html += '<input class="edit-input" id="editStart" type="date" value="' + t.start + '" />';
-  html += '<span style="color:#C8B0B0;">~</span>';
-  html += '<input class="edit-input" id="editEnd" type="date" value="' + t.end + '" />';
-  html += '</div>';
-
-  html += '<div class="edit-row">';
-  html += '<span class="edit-label">색상</span>';
-  Object.keys(COLORS).forEach(c => {
-    const sel = c === t.color ? ' selected' : '';
-    html += '<div class="color-option' + sel + '" style="background:' + COLORS[c] + ';" onclick="setColor(\'' + c + '\')"></div>';
-  });
-  html += '</div>';
-
-  html += '<div class="edit-row">';
-  html += '<span class="edit-label">상태</span>';
-  Object.keys(STATUS_MAP).forEach(s => {
-    const sel = s === t.status ? ' selected' : '';
-    html += '<button class="status-option' + sel + '" onclick="setStatus(\'' + s + '\')">' + STATUS_MAP[s].text + '</button>';
-  });
-  html += '</div>';
-
-  panel.innerHTML = html;
-  panel.classList.add('open');
-
-  document.getElementById('editName').onchange = e => {
-    t.name = e.target.value; save(); render();
-  };
-  document.getElementById('editStart').onchange = e => {
-    t.start = e.target.value; save(); render();
-  };
-  document.getElementById('editEnd').onchange = e => {
-    t.end = e.target.value; save(); render();
-  };
-}
-
-window.setColor = c => {
-  const t = tasks.find(x => x.id === selectedId);
-  if (t) { t.color = c; save(); render(); }
-};
-window.setStatus = s => {
-  const t = tasks.find(x => x.id === selectedId);
-  if (t) { t.status = s; save(); render(); }
-};
-window.selectTask = selectTask;
-
-// ── 추가/삭제 ──
-document.getElementById('addBtn').onclick = () => {
-  const today = new Date();
-  const end = new Date(today); end.setDate(end.getDate() + 14);
-  const id = Date.now();
-  tasks.push({
-    id, name: '새 항목', color: 'pink',
-    start: fmt(today), end: fmt(end), status: 'todo'
-  });
-  selectedId = id;
-  save(); render();
-};
-
-document.getElementById('deleteBtn').onclick = () => {
-  if (!selectedId) return;
-  tasks = tasks.filter(x => x.id !== selectedId);
-  selectedId = null;
-  save(); render();
-};
-
-// ── 월 이동 ──
-document.getElementById('prevMonth').onclick = () => {
-  viewStart.setMonth(viewStart.getMonth() - 1);
-  render();
-};
-document.getElementById('nextMonth').onclick = () => {
-  viewStart.setMonth(viewStart.getMonth() + 1);
-  render();
-};
-
-// ── 초기화 ──
-load();
-render();
+load();render();
 </script>
 </body>
 </html>
